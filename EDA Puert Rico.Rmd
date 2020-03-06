@@ -1,0 +1,50 @@
+---
+title: "EDA Puerto Rico"
+author: "Alain Lesaffre"
+date: "`r Sys.Date()`"
+output:
+  prettydoc::html_pretty:
+    theme: architect
+    highlight: github
+---
+```{r init, echo=FALSE, message=FALSE}
+library(tidyverse)
+library(ggplot2)
+library(raster)
+source("./common.R")
+#
+# Get sentinel NO2 data 
+#
+no2_root   <- file.path( datafolder, "eie_data/s5p_no2/")
+no2_files  <- list.files(no2_root, full.names=T, pattern=".tif$")   # Get all file names 
+#   For meta data reading
+#   raster::stack(no2_files[1])  , will deliver information about resolution , size number of layers 
+# Extract first band only the most interesting
+no2_density_list         <- list()
+for(i in 1:length(no2_files)){
+  no2_density_list         <- append(no2_density_list,raster::stack(no2_files[i])[[1]])
+  
+}
+# Only the first 50 files could be processed this way 
+no2_density_stack <- raster::stack(no2_density_list[1:50])
+
+
+
+```
+
+## Summary
+
+The initial analysis of the Pueto Rico Kaggle competition. On kernel of interest for data reading is [Kaggle Kernel](https://www.kaggle.com/siklinator/csv-to-shapefile-raster-101-in-r). 
+
+## Data 
+
+### Sentinel 
+
+THe sentinel data with the measurment of Cabin Dioxide *(NO2)* . For NO2 the first four bands are relevant. **Band 1** is the NO2 column number density, this will very likely be the most useful band.
+
+The first overview is the following.
+
+```{r ratserview, echo=FALSE, fig.align="center"}
+plot(no2_density_stack[[1]])
+```
+
